@@ -1,3 +1,3 @@
-Graphic design, interface animation, cool stuff, just a dude.
+Hello.
 
-Go see my lead repo [Harpmod](https://github.com/romefalls/harpmod)
+Go see my lead repo [Opticworks](https://github.com/Opticworks), the successor to [Harpmod](https://github.com/romefalls/harpmod)
