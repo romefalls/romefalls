@@ -1,0 +1,1098 @@
+-- I know this code is shit. Cry about it. Suck my dick.
+
+
+
+local speed = 0.6 -- in seconds
+_G.LGEnablable = true
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local char = localPlayer.Character
+local camera = game:GetService("Workspace").CurrentCamera
+local humanoid = char:FindFirstChild("Humanoid")
+local UIS = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+
+local function tween(instance,tweenInfo,propertyTable)
+    game:GetService("TweenService"):Create(instance,tweenInfo,propertyTable):Play()
+end
+local function play(id,volume,speed)
+    assert(id,"play sound function is completely empty.")
+    coroutine.wrap(function()
+        local snd = Instance.new("Sound")
+        snd.SoundId = "rbxassetid://"..id
+        snd.Volume = volume or 0.5
+        snd.PlaybackSpeed = speed or 1
+        snd.Parent = workspace
+        snd:Play()
+        game.Debris:AddItem(snd,10+snd.TimeLength)
+    end)()
+end
+function tween(instance,tsi,propertytable)
+    game:GetService("TweenService"):Create(instance,tsi,propertytable):Play() -- i know. shut up
+    end
+    function getRigType(char) -- dumb
+    local RigType
+    if char.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+        RigType = "R15"
+    else
+        RigType = "R6"
+    end
+    return RigType
+    end
+    function getRoot(char)
+        local rootPart = char:FindFirstChild('HumanoidRootPart') or char:FindFirstChild('Torso') or char:FindFirstChild('UpperTorso')
+        return rootPart
+    end
+    
+
+local camera = game:GetService("Workspace").CurrentCamera
+local beamIsOn = false -- i wouldn't do this if i didn't use tweens
+
+
+
+
+
+
+local settingsGUI = Instance.new("ScreenGui")
+settingsGUI.DisplayOrder = 1
+settingsGUI.IgnoreGuiInset = true
+settingsGUI.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+settingsGUI.ResetOnSpawn = false
+settingsGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+settingsGUI.Name = "Settings"
+settingsGUI.Parent = game:GetService("CoreGui")
+
+local background = Instance.new("Frame")
+background.AnchorPoint = Vector2.new(0.5, 0.5)
+background.BackgroundColor3 = Color3.new(0, 0, 0)
+background.BackgroundTransparency = 0.25
+background.BorderColor3 = Color3.new(0, 0.72549, 1)
+background.BorderSizePixel = 0
+background.Position = UDim2.new(0.5, 0, 0.5, 0)
+background.Size = UDim2.new(1, 0, 1, 0)
+background.Visible = true
+background.Name = "Background"
+background.Parent = settingsGUI
+
+local topbar = Instance.new("Frame")
+topbar.AnchorPoint = Vector2.new(0.5, 0.5)
+topbar.BackgroundColor3 = Color3.new(1, 1, 1)
+topbar.BackgroundTransparency = 1
+topbar.Position = UDim2.new(0.5, 0, 0.107925184, 0)
+topbar.Size = UDim2.new(0.859930336, 0, 0.0403990373, 0)
+topbar.Visible = true
+topbar.Name = "Topbar"
+topbar.Parent = background
+
+local text_label = Instance.new("TextLabel")
+text_label.FontFace = Font.fromId(12187365364)
+text_label.Text = "Laser Grapple"
+text_label.TextColor3 = Color3.new(1, 1, 1)
+text_label.TextSize = 20
+text_label.TextXAlignment = Enum.TextXAlignment.Right
+text_label.BackgroundColor3 = Color3.new(1, 1, 1)
+text_label.BackgroundTransparency = 1
+text_label.Size = UDim2.new(0.150243536, 0, 1, 0)
+text_label.Visible = true
+text_label.Parent = topbar
+
+local settings_2 = Instance.new("ImageButton")
+settings_2.Image = "rbxassetid://7734053495"
+settings_2.ScaleType = Enum.ScaleType.Fit
+settings_2.AnchorPoint = Vector2.new(0.5, 0.5)
+settings_2.BackgroundColor3 = Color3.new(1, 1, 1)
+settings_2.BackgroundTransparency = 1
+settings_2.Position = UDim2.new(0.224999994, 0, 0.5, 0)
+settings_2.Size = UDim2.new(0.119999997, 0, 0.74074012, 0)
+settings_2.Visible = true
+settings_2.Name = "Settings"
+settings_2.Parent = text_label
+
+local uicorner = Instance.new("UICorner")
+uicorner.CornerRadius = UDim.new(0.10000000149011612, 0)
+uicorner.Parent = settings_2
+
+local divider = Instance.new("Frame")
+divider.AnchorPoint = Vector2.new(0.5, 0.5)
+divider.BackgroundColor3 = Color3.new(1, 1, 1)
+divider.Position = UDim2.new(0.0630709231, 0, 0.5, 0)
+divider.Size = UDim2.new(0, 2, 0.537037373, 0)
+divider.Visible = true
+divider.Name = "Divider"
+divider.Parent = text_label
+
+local uicorner_2 = Instance.new("UICorner")
+uicorner_2.Parent = divider
+
+local setting_frame = Instance.new("Frame")
+setting_frame.AnchorPoint = Vector2.new(0.5, 0.5)
+setting_frame.BackgroundColor3 = Color3.new(1, 1, 1)
+setting_frame.BackgroundTransparency = 1
+setting_frame.Position = UDim2.new(0.172803611, 0, 0.5, 0)
+setting_frame.Size = UDim2.new(0.173126608, 0, 0.659600973, 0)
+setting_frame.Visible = true
+setting_frame.Name = "SettingFrame"
+setting_frame.Parent = background
+
+local uilist_layout = Instance.new("UIListLayout")
+uilist_layout.Padding = UDim.new(0, 9)
+uilist_layout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+uilist_layout.SortOrder = Enum.SortOrder.LayoutOrder
+uilist_layout.Parent = setting_frame
+
+local setting = Instance.new("Frame")
+setting.BackgroundColor3 = Color3.new(0.133333, 0.133333, 0.133333)
+setting.BorderColor3 = Color3.new(0, 0.72549, 1)
+setting.BorderSizePixel = 0
+setting.Position = UDim2.new(-0.0373134315, 0, 0, 0)
+setting.Size = UDim2.new(1, 0, 0.100000001, 0)
+setting.Visible = true
+setting.ZIndex = 2
+setting.Name = "Setting"
+setting.Parent = setting_frame
+
+local settings_label = Instance.new("TextLabel")
+settings_label.FontFace = Font.fromId(12187365364)
+settings_label.TextColor3 = Color3.new(1, 1, 1)
+settings_label.TextSize = 14
+settings_label.TextXAlignment = Enum.TextXAlignment.Left
+settings_label.AnchorPoint = Vector2.new(0.5, 0.5)
+settings_label.BackgroundColor3 = Color3.new(1, 1, 1)
+settings_label.BackgroundTransparency = 1
+settings_label.Position = UDim2.new(0.432622761, 0, 0.49999994, 0)
+settings_label.Size = UDim2.new(0.623109937, 0, 1, 0)
+settings_label.Visible = true
+settings_label.Name = "SettingsLabel"
+settings_label.Parent = setting
+
+local uicorner_3 = Instance.new("UICorner")
+uicorner_3.Parent = setting
+
+local slider = Instance.new("ImageButton")
+slider.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+slider.ImageTransparency = 1
+slider.AnchorPoint = Vector2.new(0.5, 0.5)
+slider.BackgroundColor3 = Color3.new(0.333333, 0.333333, 0.333333)
+slider.Position = UDim2.new(0.823769987, 0, 0.491132319, 0)
+slider.Size = UDim2.new(0.13059701, 0, 0.340264648, 0)
+slider.Visible = true
+slider.Name = "Slider"
+slider.Parent = setting
+
+local slider_circle = Instance.new("ImageButton")
+slider_circle.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+slider_circle.ImageTransparency = 1
+slider_circle.ScaleType = Enum.ScaleType.Fit
+slider_circle.AnchorPoint = Vector2.new(1, 0.5)
+slider_circle.BackgroundColor3 = Color3.new(1, 1, 1)
+slider_circle.Position = UDim2.new(0.5, 0, 0.5, 0)
+slider_circle.Size = UDim2.new(0.518762827, 0, 1, 0)
+slider_circle.Visible = true
+slider_circle.Name = "SliderCircle"
+slider_circle.Parent = slider
+
+local uicorner_4 = Instance.new("UICorner")
+uicorner_4.CornerRadius = UDim.new(0, 16)
+uicorner_4.Parent = slider_circle
+
+local uiaspect_ratio_constraint = Instance.new("UIAspectRatioConstraint")
+uiaspect_ratio_constraint.AspectRatio = 1.0087053775787354
+uiaspect_ratio_constraint.Parent = slider_circle
+
+local uicorner_5 = Instance.new("UICorner")
+uicorner_5.CornerRadius = UDim.new(0, 16)
+uicorner_5.Parent = slider
+
+local uistroke = Instance.new("UIStroke")
+uistroke.Color = Color3.new(0, 0.72549, 1)
+uistroke.Thickness = 0
+uistroke.Parent = setting
+
+local description = Instance.new("Frame")
+description.AnchorPoint = Vector2.new(1, 0.5)
+description.BackgroundColor3 = Color3.new(0, 0, 0)
+description.BackgroundTransparency = 1
+description.BorderColor3 = Color3.new(0.105882, 0.164706, 0.207843)
+description.ClipsDescendants = true
+description.Position = UDim2.new(1, 0, 0.5, 0)
+description.Size = UDim2.new(1, 0, 1, 0)
+description.Visible = true
+description.ZIndex = -1
+description.Name = "Description"
+description.Parent = setting
+
+local uicorner_6 = Instance.new("UICorner")
+uicorner_6.Parent = description
+
+local description_label = Instance.new("TextLabel")
+description_label.FontFace = Font.fromId(12187365364)
+description_label.Text = "Hello! I am a description"
+description_label.TextColor3 = Color3.new(1, 1, 1)
+description_label.TextSize = 14
+description_label.TextTransparency = 1
+description_label.BackgroundColor3 = Color3.new(1, 1, 1)
+description_label.BackgroundTransparency = 1
+description_label.Size = UDim2.new(1, 0, 1, 0)
+description_label.Visible = true
+description_label.Name = "DescriptionLabel"
+description_label.Parent = description
+
+local side_frame = Instance.new("Frame")
+side_frame.BackgroundColor3 = Color3.new(1, 1, 1)
+side_frame.BackgroundTransparency = 1
+side_frame.Position = UDim2.new(0.892864347, 0, 0.275244504, 0)
+side_frame.Size = UDim2.new(0.0194297321, 0, 0.486376822, 0)
+side_frame.Visible = true
+side_frame.Name = "SideFrame"
+side_frame.Parent = background
+
+local uilist_layout_2 = Instance.new("UIListLayout")
+uilist_layout_2.Padding = UDim.new(0.02500000037252903, 0)
+uilist_layout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uilist_layout_2.SortOrder = Enum.SortOrder.LayoutOrder
+uilist_layout_2.Parent = side_frame
+
+local button = Instance.new("ImageButton")
+button.Image = "rbxassetid://7733992677"
+button.ImageTransparency = 0.25
+button.ScaleType = Enum.ScaleType.Fit
+button.AnchorPoint = Vector2.new(0.5, 0.5)
+button.BackgroundColor3 = Color3.new(1, 1, 1)
+button.BackgroundTransparency = 1
+button.Position = UDim2.new(0.5, 0, 0.0312154926, 0)
+button.Size = UDim2.new(1, 0, 0.062430907, 0)
+button.Visible = true
+button.Name = "Button"
+button.Parent = side_frame
+
+local desc = Instance.new("TextLabel")
+desc.FontFace = Font.fromId(12187365364)
+desc.TextColor3 = Color3.new(1, 1, 1)
+desc.TextSize = 14
+desc.TextTransparency = 0.9700000286102295
+desc.AnchorPoint = Vector2.new(0.5, 0.5)
+desc.BackgroundColor3 = Color3.new(0, 0, 0)
+desc.BackgroundTransparency = 1
+desc.Position = UDim2.new(0, 0, 0.5, 0)
+desc.Size = UDim2.new(5.08333349, 0, 1, 0)
+desc.Visible = true
+desc.Name = "Desc"
+desc.Parent = button
+
+local uicorner_7 = Instance.new("UICorner")
+uicorner_7.Parent = desc
+
+local background_2 = Instance.new("Frame")
+background_2.AnchorPoint = Vector2.new(0.5, 0.5)
+background_2.BackgroundColor3 = Color3.new(0, 0, 0)
+background_2.BackgroundTransparency = 0.25
+background_2.BorderColor3 = Color3.new(0, 0.72549, 1)
+background_2.BorderSizePixel = 0
+background_2.Position = UDim2.new(0.5, 0, 0.5, 0)
+background_2.Size = UDim2.new(1, 0, 1, 0)
+background_2.Visible = true
+background_2.Name = "Background"
+background_2.Parent = workspace
+
+local topbar_2 = Instance.new("Frame")
+topbar_2.AnchorPoint = Vector2.new(0.5, 0.5)
+topbar_2.BackgroundColor3 = Color3.new(1, 1, 1)
+topbar_2.BackgroundTransparency = 1
+topbar_2.Position = UDim2.new(0.5, 0, 0.107925184, 0)
+topbar_2.Size = UDim2.new(0.859930336, 0, 0.0403990373, 0)
+topbar_2.Visible = true
+topbar_2.Name = "Topbar"
+topbar_2.Parent = background_2
+
+local text_label_2 = Instance.new("TextLabel")
+text_label_2.FontFace = Font.fromId(12187365364)
+text_label_2.Text = "Quick Settings"
+text_label_2.TextColor3 = Color3.new(1, 1, 1)
+text_label_2.TextSize = 20
+text_label_2.TextXAlignment = Enum.TextXAlignment.Right
+text_label_2.BackgroundColor3 = Color3.new(1, 1, 1)
+text_label_2.BackgroundTransparency = 1
+text_label_2.Size = UDim2.new(0.150243536, 0, 1, 0)
+text_label_2.Visible = true
+text_label_2.Parent = topbar_2
+
+local settings_3 = Instance.new("ImageButton")
+settings_3.Image = "rbxassetid://7734053495"
+settings_3.ScaleType = Enum.ScaleType.Fit
+settings_3.AnchorPoint = Vector2.new(0.5, 0.5)
+settings_3.BackgroundColor3 = Color3.new(1, 1, 1)
+settings_3.BackgroundTransparency = 1
+settings_3.Position = UDim2.new(0.224999994, 0, 0.5, 0)
+settings_3.Size = UDim2.new(0.119999997, 0, 0.74074012, 0)
+settings_3.Visible = true
+settings_3.Name = "Settings"
+settings_3.Parent = text_label_2
+
+local uicorner_8 = Instance.new("UICorner")
+uicorner_8.CornerRadius = UDim.new(0.10000000149011612, 0)
+uicorner_8.Parent = settings_3
+
+local divider_2 = Instance.new("Frame")
+divider_2.AnchorPoint = Vector2.new(0.5, 0.5)
+divider_2.BackgroundColor3 = Color3.new(1, 1, 1)
+divider_2.Position = UDim2.new(0.0630709231, 0, 0.5, 0)
+divider_2.Size = UDim2.new(0, 2, 0.537037373, 0)
+divider_2.Visible = true
+divider_2.Name = "Divider"
+divider_2.Parent = text_label_2
+
+local uicorner = Instance.new("UICorner")
+uicorner.Parent = divider_2
+
+local setting_frame_2 = Instance.new("Frame")
+setting_frame_2.AnchorPoint = Vector2.new(0.5, 0.5)
+setting_frame_2.BackgroundColor3 = Color3.new(1, 1, 1)
+setting_frame_2.BackgroundTransparency = 1
+setting_frame_2.Position = UDim2.new(0.172803611, 0, 0.5, 0)
+setting_frame_2.Size = UDim2.new(0.173126608, 0, 0.659600973, 0)
+setting_frame_2.Visible = true
+setting_frame_2.Name = "SettingFrame"
+setting_frame_2.Parent = background_2
+
+local uilist_layout_3 = Instance.new("UIListLayout")
+uilist_layout_3.Padding = UDim.new(0, 9)
+uilist_layout_3.HorizontalAlignment = Enum.HorizontalAlignment.Right
+uilist_layout_3.SortOrder = Enum.SortOrder.LayoutOrder
+uilist_layout_3.Parent = setting_frame_2
+
+local setting_2 = Instance.new("Frame")
+setting_2.BackgroundColor3 = Color3.new(0.133333, 0.133333, 0.133333)
+setting_2.BorderColor3 = Color3.new(0, 0.72549, 1)
+setting_2.BorderSizePixel = 0
+setting_2.Position = UDim2.new(-0.0373134315, 0, 0, 0)
+setting_2.Size = UDim2.new(1, 0, 0.100000001, 0)
+setting_2.Visible = true
+setting_2.ZIndex = 2
+setting_2.Name = "Setting"
+setting_2.Parent = setting_frame_2
+
+local settings_label_2 = Instance.new("TextLabel")
+settings_label_2.FontFace = Font.fromId(12187365364)
+settings_label_2.TextColor3 = Color3.new(1, 1, 1)
+settings_label_2.TextSize = 14
+settings_label_2.TextXAlignment = Enum.TextXAlignment.Left
+settings_label_2.AnchorPoint = Vector2.new(0.5, 0.5)
+settings_label_2.BackgroundColor3 = Color3.new(1, 1, 1)
+settings_label_2.BackgroundTransparency = 1
+settings_label_2.Position = UDim2.new(0.432622761, 0, 0.49999994, 0)
+settings_label_2.Size = UDim2.new(0.623109937, 0, 1, 0)
+settings_label_2.Visible = true
+settings_label_2.Name = "SettingsLabel"
+settings_label_2.Parent = setting_2
+
+local uicorner_2 = Instance.new("UICorner")
+uicorner_2.Parent = setting_2
+
+local slider_2 = Instance.new("ImageButton")
+slider_2.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+slider_2.ImageTransparency = 1
+slider_2.AnchorPoint = Vector2.new(0.5, 0.5)
+slider_2.BackgroundColor3 = Color3.new(0.333333, 0.333333, 0.333333)
+slider_2.Position = UDim2.new(0.823769987, 0, 0.491132319, 0)
+slider_2.Size = UDim2.new(0.13059701, 0, 0.340264648, 0)
+slider_2.Visible = true
+slider_2.Name = "Slider"
+slider_2.Parent = setting_2
+
+local slider_circle_2 = Instance.new("ImageButton")
+slider_circle_2.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+slider_circle_2.ImageTransparency = 1
+slider_circle_2.ScaleType = Enum.ScaleType.Fit
+slider_circle_2.AnchorPoint = Vector2.new(1, 0.5)
+slider_circle_2.BackgroundColor3 = Color3.new(1, 1, 1)
+slider_circle_2.Position = UDim2.new(0.5, 0, 0.5, 0)
+slider_circle_2.Size = UDim2.new(0.518762827, 0, 1, 0)
+slider_circle_2.Visible = true
+slider_circle_2.Name = "SliderCircle"
+slider_circle_2.Parent = slider_2
+
+local uicorner_3 = Instance.new("UICorner")
+uicorner_3.CornerRadius = UDim.new(0, 16)
+uicorner_3.Parent = slider_circle_2
+
+local uiaspect_ratio_constraint_2 = Instance.new("UIAspectRatioConstraint")
+uiaspect_ratio_constraint_2.AspectRatio = 1.0087053775787354
+uiaspect_ratio_constraint_2.Parent = slider_circle_2
+
+local uicorner_4 = Instance.new("UICorner")
+uicorner_4.CornerRadius = UDim.new(0, 16)
+uicorner_4.Parent = slider_2
+
+local uistroke_2 = Instance.new("UIStroke")
+uistroke_2.Color = Color3.new(0, 0.72549, 1)
+uistroke_2.Thickness = 0
+uistroke_2.Parent = setting_2
+
+local description_2 = Instance.new("Frame")
+description_2.AnchorPoint = Vector2.new(1, 0.5)
+description_2.BackgroundColor3 = Color3.new(0, 0, 0)
+description_2.BackgroundTransparency = 1
+description_2.BorderColor3 = Color3.new(0.105882, 0.164706, 0.207843)
+description_2.ClipsDescendants = true
+description_2.Position = UDim2.new(1, 0, 0.5, 0)
+description_2.Size = UDim2.new(1, 0, 1, 0)
+description_2.Visible = true
+description_2.ZIndex = -1
+description_2.Name = "Description"
+description_2.Parent = setting_2
+
+local uicorner_5 = Instance.new("UICorner")
+uicorner_5.Parent = description_2
+
+local description_label_2 = Instance.new("TextLabel")
+description_label_2.FontFace = Font.fromId(12187365364)
+description_label_2.Text = "Hello! I am a description"
+description_label_2.TextColor3 = Color3.new(1, 1, 1)
+description_label_2.TextSize = 14
+description_label_2.TextTransparency = 1
+description_label_2.BackgroundColor3 = Color3.new(1, 1, 1)
+description_label_2.BackgroundTransparency = 1
+description_label_2.Size = UDim2.new(1, 0, 1, 0)
+description_label_2.Visible = true
+description_label_2.Name = "DescriptionLabel"
+description_label_2.Parent = description_2
+
+local side_frame_2 = Instance.new("Frame")
+side_frame_2.BackgroundColor3 = Color3.new(1, 1, 1)
+side_frame_2.BackgroundTransparency = 1
+side_frame_2.Position = UDim2.new(0.892864347, 0, 0.275244504, 0)
+side_frame_2.Size = UDim2.new(0.0194297321, 0, 0.486376822, 0)
+side_frame_2.Visible = true
+side_frame_2.Name = "SideFrame"
+side_frame_2.Parent = background_2
+
+local uilist_layout = Instance.new("UIListLayout")
+uilist_layout.Padding = UDim.new(0.025, 0)
+uilist_layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uilist_layout.SortOrder = Enum.SortOrder.LayoutOrder
+uilist_layout.Parent = side_frame_2
+
+local button_2 = Instance.new("ImageButton")
+button_2.Image = "rbxassetid://7733992677"
+button_2.ImageTransparency = 0.25
+button_2.ScaleType = Enum.ScaleType.Fit
+button_2.AnchorPoint = Vector2.new(0.5, 0.5)
+button_2.BackgroundColor3 = Color3.new(1, 1, 1)
+button_2.BackgroundTransparency = 1
+button_2.Position = UDim2.new(0.5, 0, 0.0312154926, 0)
+button_2.Size = UDim2.new(1, 0, 0.062430907, 0)
+button_2.Visible = true
+button_2.Name = "Button"
+button_2.Parent = side_frame_2
+
+local desc_2 = Instance.new("TextLabel")
+desc_2.FontFace = Font.fromId(12187365364)
+desc_2.TextColor3 = Color3.new(1, 1, 1)
+desc_2.TextSize = 14
+desc_2.TextTransparency = 0.97
+desc_2.AnchorPoint = Vector2.new(0.5, 0.5)
+desc_2.BackgroundColor3 = Color3.new(0, 0, 0)
+desc_2.BackgroundTransparency = 1
+desc_2.Position = UDim2.new(0, 0, 0.5, 0)
+desc_2.Size = UDim2.new(5.08333349, 0, 1, 0)
+desc_2.Visible = true
+desc_2.Name = "Desc"
+desc_2.Parent = button_2
+
+local uicorner_6 = Instance.new("UICorner")
+uicorner_6.Parent = desc_2
+
+local setting_frame = Instance.new("Frame")
+setting_frame.AnchorPoint = Vector2.new(0.5, 0.5)
+setting_frame.BackgroundColor3 = Color3.new(1, 1, 1)
+setting_frame.BackgroundTransparency = 1
+setting_frame.Position = UDim2.new(0.172803611, 0, 0.5, 0)
+setting_frame.Size = UDim2.new(0.173126608, 0, 0.659600973, 0)
+setting_frame.Visible = true
+setting_frame.Name = "SettingFrame"
+setting_frame.Parent = workspace
+
+local uilist_layout_2 = Instance.new("UIListLayout")
+uilist_layout_2.Padding = UDim.new(0, 9)
+uilist_layout_2.HorizontalAlignment = Enum.HorizontalAlignment.Right
+uilist_layout_2.SortOrder = Enum.SortOrder.LayoutOrder
+uilist_layout_2.Parent = setting_frame
+
+local setting = Instance.new("Frame")
+setting.BackgroundColor3 = Color3.new(0.133333, 0.133333, 0.133333)
+setting.BorderColor3 = Color3.new(0, 0.72549, 1)
+setting.BorderSizePixel = 0
+setting.Position = UDim2.new(-0.0373134315, 0, 0, 0)
+setting.Size = UDim2.new(1, 0, 0.100000001, 0)
+setting.Visible = true
+setting.ZIndex = 2
+setting.Name = "Setting"
+setting.Parent = setting_frame
+
+local settings_label = Instance.new("TextLabel")
+settings_label.FontFace = Font.fromId(12187365364)
+settings_label.TextColor3 = Color3.new(1, 1, 1)
+settings_label.TextSize = 14
+settings_label.TextXAlignment = Enum.TextXAlignment.Left
+settings_label.AnchorPoint = Vector2.new(0.5, 0.5)
+settings_label.BackgroundColor3 = Color3.new(1, 1, 1)
+settings_label.BackgroundTransparency = 1
+settings_label.Position = UDim2.new(0.432622761, 0, 0.49999994, 0)
+settings_label.Size = UDim2.new(0.623109937, 0, 1, 0)
+settings_label.Visible = true
+settings_label.Name = "SettingsLabel"
+settings_label.Parent = setting
+
+local uicorner_7 = Instance.new("UICorner")
+uicorner_7.Parent = setting
+
+local slider = Instance.new("ImageButton")
+slider.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+slider.ImageTransparency = 1
+slider.AnchorPoint = Vector2.new(0.5, 0.5)
+slider.BackgroundColor3 = Color3.new(0.333333, 0.333333, 0.333333)
+slider.Position = UDim2.new(0.823769987, 0, 0.491132319, 0)
+slider.Size = UDim2.new(0.13059701, 0, 0.340264648, 0)
+slider.Visible = true
+slider.Name = "Slider"
+slider.Parent = setting
+
+local slider_circle = Instance.new("ImageButton")
+slider_circle.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+slider_circle.ImageTransparency = 1
+slider_circle.ScaleType = Enum.ScaleType.Fit
+slider_circle.AnchorPoint = Vector2.new(1, 0.5)
+slider_circle.BackgroundColor3 = Color3.new(1, 1, 1)
+slider_circle.Position = UDim2.new(0.5, 0, 0.5, 0)
+slider_circle.Size = UDim2.new(0.518762827, 0, 1, 0)
+slider_circle.Visible = true
+slider_circle.Name = "SliderCircle"
+slider_circle.Parent = slider
+
+local uicorner_2 = Instance.new("UICorner")
+uicorner_2.CornerRadius = UDim.new(0, 16)
+uicorner_2.Parent = slider_circle
+
+local uiaspect_ratio_constraint = Instance.new("UIAspectRatioConstraint")
+uiaspect_ratio_constraint.AspectRatio = 1.0087053775787354
+uiaspect_ratio_constraint.Parent = slider_circle
+
+local uicorner_3 = Instance.new("UICorner")
+uicorner_3.CornerRadius = UDim.new(0, 16)
+uicorner_3.Parent = slider
+
+local uistroke = Instance.new("UIStroke")
+uistroke.Color = Color3.new(0, 0.72549, 1)
+uistroke.Thickness = 0
+uistroke.Parent = setting
+
+local description = Instance.new("Frame")
+description.AnchorPoint = Vector2.new(1, 0.5)
+description.BackgroundColor3 = Color3.new(0, 0, 0)
+description.BackgroundTransparency = 1
+description.BorderColor3 = Color3.new(0.105882, 0.164706, 0.207843)
+description.ClipsDescendants = true
+description.Position = UDim2.new(1, 0, 0.5, 0)
+description.Size = UDim2.new(1, 0, 1, 0)
+description.Visible = true
+description.ZIndex = -1
+description.Name = "Description"
+description.Parent = setting
+
+local uicorner_4 = Instance.new("UICorner")
+uicorner_4.Parent = description
+
+local description_label = Instance.new("TextLabel")
+description_label.FontFace = Font.fromId(12187365364)
+description_label.Text = "Hello! I am a description"
+description_label.TextColor3 = Color3.new(1, 1, 1)
+description_label.TextSize = 14
+description_label.TextTransparency = 1
+description_label.BackgroundColor3 = Color3.new(1, 1, 1)
+description_label.BackgroundTransparency = 1
+description_label.Size = UDim2.new(1, 0, 1, 0)
+description_label.Visible = true
+description_label.Name = "DescriptionLabel"
+description_label.Parent = description
+
+local side_frame = Instance.new("Frame")
+side_frame.BackgroundColor3 = Color3.new(1, 1, 1)
+side_frame.BackgroundTransparency = 1
+side_frame.Position = UDim2.new(0.892864347, 0, 0.275244504, 0)
+side_frame.Size = UDim2.new(0.0194297321, 0, 0.486376822, 0)
+side_frame.Visible = true
+side_frame.Name = "SideFrame"
+side_frame.Parent = workspace
+
+local uilist_layout_3 = Instance.new("UIListLayout")
+uilist_layout_3.Padding = UDim.new(0.02500000037252903, 0)
+uilist_layout_3.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uilist_layout_3.SortOrder = Enum.SortOrder.LayoutOrder
+uilist_layout_3.Parent = side_frame
+
+local button = Instance.new("ImageButton")
+button.Image = "rbxassetid://7733992677"
+button.ImageTransparency = 0.25
+button.ScaleType = Enum.ScaleType.Fit
+button.AnchorPoint = Vector2.new(0.5, 0.5)
+button.BackgroundColor3 = Color3.new(1, 1, 1)
+button.BackgroundTransparency = 1
+button.Position = UDim2.new(0.5, 0, 0.0312154926, 0)
+button.Size = UDim2.new(1, 0, 0.062430907, 0)
+button.Visible = true
+button.Name = "Button"
+button.Parent = side_frame
+
+local desc = Instance.new("TextLabel")
+desc.FontFace = Font.fromId(12187365364)
+desc.TextColor3 = Color3.new(1, 1, 1)
+desc.TextSize = 14
+desc.TextTransparency = 0.9700000286102295
+desc.AnchorPoint = Vector2.new(0.5, 0.5)
+desc.BackgroundColor3 = Color3.new(0, 0, 0)
+desc.BackgroundTransparency = 1
+desc.Position = UDim2.new(0, 0, 0.5, 0)
+desc.Size = UDim2.new(5.08333349, 0, 1, 0)
+desc.Visible = true
+desc.Name = "Desc"
+desc.Parent = button
+
+local uicorner_5 = Instance.new("UICorner")
+uicorner_5.Parent = desc
+
+local topbar = Instance.new("Frame")
+topbar.AnchorPoint = Vector2.new(0.5, 0.5)
+topbar.BackgroundColor3 = Color3.new(1, 1, 1)
+topbar.BackgroundTransparency = 1
+topbar.Position = UDim2.new(0.5, 0, 0.107925184, 0)
+topbar.Size = UDim2.new(0.859930336, 0, 0.0403990373, 0)
+topbar.Visible = true
+topbar.Name = "Topbar"
+topbar.Parent = workspace
+
+local text_label = Instance.new("TextLabel")
+text_label.FontFace = Font.fromId(12187365364)
+text_label.Text = "Quick Settings"
+text_label.TextColor3 = Color3.new(1, 1, 1)
+text_label.TextSize = 20
+text_label.TextXAlignment = Enum.TextXAlignment.Right
+text_label.BackgroundColor3 = Color3.new(1, 1, 1)
+text_label.BackgroundTransparency = 1
+text_label.Size = UDim2.new(0.150243536, 0, 1, 0)
+text_label.Visible = true
+text_label.Parent = topbar
+
+local settings_2 = Instance.new("ImageButton")
+settings_2.Image = "rbxassetid://7734053495"
+settings_2.ScaleType = Enum.ScaleType.Fit
+settings_2.AnchorPoint = Vector2.new(0.5, 0.5)
+settings_2.BackgroundColor3 = Color3.new(1, 1, 1)
+settings_2.BackgroundTransparency = 1
+settings_2.Position = UDim2.new(0.224999994, 0, 0.5, 0)
+settings_2.Size = UDim2.new(0.119999997, 0, 0.74074012, 0)
+settings_2.Visible = true
+settings_2.Name = "Settings"
+settings_2.Parent = text_label
+
+local uicorner_6 = Instance.new("UICorner")
+uicorner_6.CornerRadius = UDim.new(0.10000000149011612, 0)
+uicorner_6.Parent = settings_2
+
+local divider = Instance.new("Frame")
+divider.AnchorPoint = Vector2.new(0.5, 0.5)
+divider.BackgroundColor3 = Color3.new(1, 1, 1)
+divider.Position = UDim2.new(0.0630709231, 0, 0.5, 0)
+divider.Size = UDim2.new(0, 2, 0.537037373, 0)
+divider.Visible = true
+divider.Name = "Divider"
+divider.Parent = text_label
+
+local uicorner_8 = Instance.new("UICorner")
+uicorner_8.Parent = divider
+
+
+local tsi = {}
+local sound = {}
+local vfx = {}
+
+tsi.Expo1Out = TweenInfo.new(1,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out)
+tsi.Expo05Out = TweenInfo.new(0.5,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out)
+tsi.Sine1Out = TweenInfo.new(1,Enum.EasingStyle.Sine,Enum.EasingDirection.Out)
+tsi.Sine01Out = TweenInfo.new(0.01,Enum.EasingStyle.Sine,Enum.EasingDirection.Out)
+tsi.ExpoSpeedOut = TweenInfo.new(speed,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out)
+
+
+vfx.Blur = Instance.new("BlurEffect",Lighting)
+vfx.CC = Instance.new("ColorCorrectionEffect",Lighting)
+vfx.SunRays = Instance.new("SunRaysEffect",Lighting)
+
+local Var4 = true -- has player shown settings menu?
+
+
+--[[ These ones are completely unused. Do watever.
+local Var5 = true -- has player shown main menu?
+local Var6 = false -- has player clicked on a sideframe button?
+local Var7 = false -- has player shown credits...........?????????????/
+local Var8 = false -- deadzone?
+sound.normalStartup = 13113097605
+sound.deadzoneShrink = 14497339171
+sound.deadzoneExpand = 14497339381
+sound.Toast = 13113095869
+sound.MessageToast = 13113097906
+sound.UIOpen = 13113098387
+sound.UIClose = 13113099070
+sound.HideModal = 13113099211
+]] 
+
+
+sound.buttonHover = 13134001196
+sound.toggleButtonOn = 13113096055
+sound.toggleButtonOff = 13113096837
+sound.SideMenuFlyIn = 13113097311
+sound.SideMenuFlyOut = 13113096593
+sound.laserGrappleFire = 201858045
+sound.laserGrappleFireAlt = 1905343596 
+sound.laserGrappleEnable = 9116228469 
+sound.laserGrappleDisable = 9116236392  
+sound.laserGrappleReuse = 8464268467
+sound.laserGrappleNil = 9120299506
+sound.laserGrappleReuseAlt = 1874883944
+sound.laserGrappleReel = 9117685701
+
+
+
+
+
+-- settings
+
+local settingsBackground = settingsGUI.Background
+local settingsFrame = settingsGUI.Background.SettingFrame
+local settingsSideFrame = settingsBackground.SideFrame
+local settingsButton = settingsFrame.Setting
+local settingsSideButton = settingsSideFrame.Button
+settingsSideButton.Parent = nil
+settingsButton.Parent = nil 
+_G.Settings = {}
+
+local LO = 0
+function _G.Settings:Button(name,description,sliderState,call) --[[
+    Name = what is the label called? (string)
+    Description = When player hovers over the button, what text is shown? (string)
+    Slider State = What is the original position of the slider? false = left, true = right (boolean)
+    Call = What function is called when the button is clicked? (function)
+    ]]
+    assert(call,"_G.Settings:Button() was fired, but no function call was connected. Name of setting is " .. name .. ".")
+    local newButton  = settingsButton:Clone()
+    local pulsing = false
+    newButton.Parent = settingsFrame 
+    newButton.SettingsLabel.Text = name
+    newButton.Description.DescriptionLabel.Text = description
+    if sliderState then
+        newButton.Slider.SliderCircle.AnchorPoint = Vector2.new(0,0.5)
+        newButton.Slider.BackgroundColor3 = Color3.fromRGB(0,87,132)
+    else 
+        newButton.Slider.SliderCircle.AnchorPoint = Vector2.new(1,0.5)
+        newButton.Slider.BackgroundColor3 = Color3.fromRGB(85, 85, 85)
+    end
+    LO = LO+1
+    newButton.LayoutOrder = LO
+    newButton.MouseEnter:Connect(function()
+        pulsing = true
+        play(sound.buttonHover)
+        coroutine.wrap(function()
+            while pulsing do 
+                tween(newButton.UIStroke,tsi.Expo1Out,{Thickness = 3,Transparency = 0.25})
+                task.wait(3)
+                tween(newButton.UIStroke,tsi.Expo05Out,{Thickness = 10,Transparency = 1})
+                task.wait(1)
+                newButton.UIStroke.Thickness = 0
+                newButton.UIStroke.Transparency = 1
+            end
+        end)()	
+        tween(newButton,tsi.Expo1Out,{BackgroundColor3 = Color3.fromRGB(24,24,24)})
+        tween(newButton.Description,tsi.Expo05Out,{AnchorPoint = Vector2.new(0,0.5),BackgroundTransparency = 0.75})
+        tween(newButton.Description.DescriptionLabel,tsi.Expo1Out,{TextTransparency = 0})
+    end)
+    newButton.MouseLeave:Connect(function()
+        pulsing = false
+        tween(newButton,tsi.Expo1Out,{BackgroundColor3 = Color3.fromRGB(34,34,34)})
+        tween(newButton.Description,tsi.Expo1Out,{AnchorPoint = Vector2.new(1,0.5),BackgroundTransparency = 1})
+        tween(newButton.Description.DescriptionLabel,tsi.Expo1Out,{TextTransparency = 1})
+        tween(newButton.UIStroke,tsi.Expo1Out,{Thickness = 0,Transparency = 1})
+    end)
+    newButton.Slider.SliderCircle.MouseButton1Down:Connect(function()
+        pcall(call)
+        if not sliderState then
+            play(sound.toggleButtonOn)
+            tween(newButton.Slider.SliderCircle,tsi.Expo05Out,{AnchorPoint = Vector2.new(0,0.5)})
+            tween(newButton.Slider,tsi.Expo05Out,{BackgroundColor3 = Color3.fromRGB(0,87,132)})
+        else 
+            play(sound.toggleButtonOff)
+            tween(newButton.Slider.SliderCircle,tsi.Expo05Out,{AnchorPoint = Vector2.new(1,0.5)})
+            tween(newButton.Slider,tsi.Expo05Out,{BackgroundColor3 = Color3.fromRGB(85,85,85)})
+        end
+        sliderState = not sliderState
+    end)
+end
+
+local function showSettings(silent)
+    if not Var4 then -- Since there aren't a lot of instances to be tweened, we can just tween each one manually to save headaches. Except for the buttons since millions of them can be added.
+        Var4 = true	
+        settingsGUI.Enabled = true
+        if not silent then
+            play(sound.SideMenuFlyIn)
+        end
+        tween(vfx.Blur,tsi.Expo1Out,{Size = 24})
+        tween(camera,tsi.Expo1Out,{FieldOfView = camera.FieldOfView + 2})
+        tween(settingsBackground,tsi.Expo1Out,{Position = UDim2.fromScale(0.5,0.5),Size = UDim2.fromScale(1,1), BackgroundTransparency = 0.1,BorderSizePixel = 100})
+        tween(settingsBackground.Topbar,tsi.Expo1Out,{Position = UDim2.fromScale(0.5,0.108)})
+        tween(settingsBackground.Topbar.TextLabel,tsi.Expo1Out,{TextTransparency = 0})
+        tween(settingsBackground.Topbar.TextLabel.Settings,tsi.Expo1Out,{ImageTransparency = 0,Rotation = 360})
+        tween(settingsBackground.Topbar.TextLabel.Divider,tsi.Expo1Out,{BackgroundTransparency = 0})
+        for _,v in pairs(settingsFrame:GetChildren()) do
+            if not v:IsA("UIListLayout") then
+                task.wait(.05)
+                tween(v,tsi.Expo1Out,{BackgroundTransparency = 0,Size = UDim2.fromScale(1,0.1)})
+                tween(v.Slider,tsi.Expo1Out,{BackgroundTransparency = 0})
+                tween(v.Slider.SliderCircle,tsi.Expo1Out,{BackgroundTransparency = 0})
+                tween(v.SettingsLabel,tsi.Expo1Out,{TextTransparency = 0,AnchorPoint = Vector2.new(0.5,0.5)})
+            end
+        end
+        for _,v in pairs(settingsSideFrame:GetChildren()) do
+            if v:IsA("ImageButton") then
+                tween(v,tsi.Expo1Out,{ImageTransparency = 0})
+            end
+        end
+    else Var4 = false
+        coroutine.wrap(function()
+            task.wait(1)
+            if not Var4 then
+                settingsGUI.Enabled = false
+            end
+        end)()
+        if not silent then 
+            play(sound.SideMenuFlyOut)
+        end
+        tween(vfx.Blur,tsi.Expo1Out,{Size = 0})
+        tween(settingsBackground,tsi.Expo1Out,{Position = UDim2.fromScale(0.3,0.5),Size = UDim2.fromScale(0.9,1),BackgroundTransparency = 1,BorderSizePixel = 0})
+        tween(settingsBackground.Topbar.TextLabel,tsi.Expo1Out,{TextTransparency = 1})
+        tween(settingsBackground.Topbar,tsi.Expo1Out,{Position = UDim2.fromScale(0.3,0.108)})
+        tween(settingsBackground.Topbar.TextLabel.Settings,tsi.Expo1Out,{ImageTransparency = 1,Rotation = -359})
+        tween(settingsBackground.Topbar.TextLabel.Divider,tsi.Expo1Out,{BackgroundTransparency = 1})
+        tween(camera,tsi.Expo1Out,{FieldOfView = camera.FieldOfView - 2})
+        for _,v in pairs(settingsFrame:GetChildren()) do
+            if not v:IsA("UIListLayout") then --Sometimes man you dont wanna tween an UIListLayout Yeah Okay? :D Itll end bad (missing properties)
+                task.wait()
+                tween(v.SettingsLabel,tsi.Expo1Out,{TextTransparency = 1,AnchorPoint = Vector2.new(1,0.5)})
+                tween(v,tsi.Expo1Out,{BackgroundTransparency = 1,Size = UDim2.fromScale(0.9,0.1)})
+                tween(v.Slider,tsi.Expo1Out,{BackgroundTransparency = 1})
+                tween(v.Slider.SliderCircle,tsi.Expo1Out,{BackgroundTransparency = 1})
+            end
+        end
+        for _,v in pairs(settingsSideFrame:GetChildren()) do
+            if v:IsA("ImageButton") then
+                tween(v,tsi.Expo1Out,{ImageTransparency = 1})
+            end
+        end
+    end
+
+end
+
+local sfxEnabled = true 
+local vfxEnabled = true 
+
+
+
+_G.Settings:Button("Laser Grapple","Press \"Z\" to toggle Laser Grapple.",true,function()
+    _G.LGEnablable = not _G.LGEnablable
+end)
+_G.Settings:Button("Toggle SFX","SFX too annoying for you?\nTurn this off.",true,function()
+    sfxEnabled = not sfxEnabled
+end)
+_G.Settings:Button("Toggle VFX","Are you epileptic or something?\nIf so, turn this off.",true,function()
+    vfxEnabled = not vfxEnabled
+end)
+
+
+
+
+
+-- i need to blow my brains out
+
+UIS.InputBegan:Connect(function(key,gpe)
+    if not gpe and key.KeyCode == Enum.KeyCode.M then
+        showSettings(false)
+    end
+end)
+
+
+
+
+
+
+
+
+
+--grapple fx
+local grappleSpark = Instance.new("ParticleEmitter",(char:FindFirstChild("RightHand") or char:FindFirstChild("RightArm")))
+
+grappleSpark.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)), ColorSequenceKeypoint.new(0.0549, Color3.fromRGB(255,247,0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255,247,0)) }
+grappleSpark.LightEmission = 1
+grappleSpark.LightInfluence = 1
+grappleSpark.Orientation = "VelocityParallel"
+grappleSpark.Size = NumberSequence.new{NumberSequenceKeypoint.new(0,0.437),NumberSequenceKeypoint.new(1,0)}
+grappleSpark.Texture = "rbxassetid://6091329339"
+grappleSpark.ZOffset = 1
+grappleSpark.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0), NumberSequenceKeypoint.new(1,0) }
+grappleSpark.Drag = 5
+grappleSpark.EmissionDirection = "Bottom"
+grappleSpark.Enabled = false
+grappleSpark.Lifetime = NumberRange.new(1,2)
+grappleSpark.Rate = 100
+grappleSpark.RotSpeed = NumberRange.new(-20,20)
+grappleSpark.Speed = NumberRange.new(5,5)
+grappleSpark.SpreadAngle = Vector2.new(-180,180)
+
+-- beam
+local arm
+if getRigType(char) == "R15" then
+arm = "RightHand"
+else arm = "RightArm"
+end
+local beam = Instance.new("Beam",char:FindFirstChild(arm))
+beam.Segments = 1
+beam.Brightness = 10
+beam.LightEmission = 5
+beam.Width0 = 0.2
+beam.Width1 = 0.2
+beam.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)}
+beam.FaceCamera = true
+beam.Enabled = false
+beam.Texture = "rbxassetid://6091329339"
+
+-- attachments
+local attachment0 = Instance.new("Attachment")
+local attachment1 = Instance.new("Attachment")
+beam.Attachment0 = attachment0
+beam.Attachment1 = attachment1
+beam.Parent = workspace.Terrain
+attachment0.Parent = workspace.Terrain
+attachment1.Parent = workspace.Terrain
+
+local mouse = localPlayer:GetMouse()
+
+RunService.RenderStepped:Connect(function()
+local character = localPlayer.Character
+    if not character then
+        grappleSpark.Enabled = false
+        beam.Enabled = false
+        return
+    end
+    local hand = char:FindFirstChild(arm) -- lol
+    if not hand then
+        grappleSpark.Enabled = false
+        beam.Enabled = false
+        return
+    end
+local origin = hand.Position
+local finish = mouse.Hit.p
+attachment0.Position = origin
+attachment1.Position = finish
+if not mouse.Target then
+    beam.Color = ColorSequence.new(Color3.fromRGB(34, 34, 34))
+else 
+    beam.Color = ColorSequence.new(Color3.fromRGB(255, 55, 55))
+end 
+end)
+mouse.Button1Down:Connect(function()
+        coroutine.wrap(function()
+            if beam.Enabled then
+                if not mouse.Target then
+                    if sfxEnabled then 
+                        play(sound.laserGrappleNil)
+                    end
+                    if vfxEnabled then
+                        vfx.CC.Saturation = -1
+                        tween(vfx.CC,tsi.Sine1Out,{Saturation = 0})
+                    end
+                else
+                    if sfxEnabled then
+                        play(sound.laserGrappleFireAlt)
+                        play(sound.laserGrappleFire)
+                        play(sound.laserGrappleReel)
+                    end
+                    beam.Enabled = false
+                    if vfxEnabled then
+                        grappleSpark.Enabled = true
+                        tween(vfx.CC,tsi.ExpoSpeedOut,{Contrast = 0.4})
+                        tween(game.Lighting,tsi.ExpoSpeedOut,{ClockTime = game.Lighting.ClockTime - 0.2})
+                    end
+                    getRoot(game.Players.LocalPlayer.Character).Anchored = true
+                    tween(getRoot(game.Players.LocalPlayer.Character),tsi.ExpoSpeedOut,{CFrame = CFrame.new(mouse.Hit.p + Vector3.new(0,3,0))})
+                    task.wait(speed)
+                    getRoot(game.Players.LocalPlayer.Character).Anchored = false
+                    if sfxEnabled then
+                        play(sound.laserGrappleReuse,0.1)
+                        play(sound.laserGrappleReuseAlt)
+                    end
+                    if vfxEnabled then
+                        Lighting.ExposureCompensation = 4
+                        vfx.SunRays.Intensity = 3
+                        tween(Lighting,tsi.ExpoSpeedOut,{ClockTime = game.Lighting.ClockTime + 0.2})
+                        tween(vfx.CC,tsi.Expo1Out,{Contrast = 0})
+                        tween(vfx.SunRays,tsi.Expo1Out,{Intensity = 0.206})
+                        tween(Lighting,tsi.Expo1Out,{ExposureCompensation = 0})
+                        grappleSpark.Enabled = false
+                    end
+                    beam.Enabled = true
+                end
+            end
+        end)()
+    end)
+
+function enableBeam()
+    coroutine.wrap(function()
+        beam.Enabled = true
+        beamIsOn = true
+        if sfxEnabled then
+        play(sound.laserGrappleEnable)
+        end
+        if vfxEnabled then
+        vfx.CC.Contrast = 0.5
+        tween(camera,tsi.Sine01Out,{FieldOfView = camera.FieldOfView - 2})
+        tween(vfx.CC,tsi.Sine1Out,{Contrast = 0})
+        tween(beam,tsi.Expo1Out,{Width1 = 0.2,Width0 = 0.2})
+        task.wait(0.1)
+        tween(camera,tsi.Sine1Out,{FieldOfView = camera.FieldOfView + 2})
+        end
+    end)()
+end
+function disableBeam()
+    coroutine.wrap(function()
+        if sfxEnabled then
+        play(sound.laserGrappleDisable)
+        end
+        if vfxEnabled then
+        tween(beam,tsi.Expo1Out,{Width1 = 0,Width0 = 0})
+        task.wait(1)
+        end
+        beamIsOn = false
+        if not beamIsOn then
+            beam.Enabled = false
+        end
+    end)()
+end
+mouse.KeyDown:Connect(function(key)
+    if key == "z" and _G.LGEnablable then
+        if not beam.Enabled  then
+            enableBeam()
+        else 
+            disableBeam()
+        end
+    end
+end)
