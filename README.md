@@ -1,1 +1,1 @@
-I am wacky little guy; the inventor of the color cyan.
+Linux skiddian and Luau idiot
